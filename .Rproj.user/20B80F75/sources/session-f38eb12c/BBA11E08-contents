@@ -1,0 +1,181 @@
+---
+title: 'Homework #2'
+author: "Rachel Brady"
+date: "2023-09-27"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Section 1: Description of the data
+
+I am using the dataset called **Candy Power Ranking** from [Five Thirty Eight’s GitHub data repository](https://github.com/fivethirtyeight/data/tree/master/candy-power-ranking).
+
+This is data collected from an online survey that pitted Halloween candy types in head-to-head battles. Ultimately, 8,371 different IP addresses voted on roughly 269,000 randomly generated match-ups.
+
+It is a flat file and is a comma-separated value (CSV) delimited file.
+
+## Section 2: Reading the data into R
+
+
+1. Load data with read_csv function, which is from the readr package.
+
+
+```{r load_data}
+library(readr)
+
+get_candy <- paste0("https://raw.githubusercontent.com/fivethirtyeight",
+                      "/data/master/candy-power-ranking/candy-data.csv")
+candy <- read_csv(get_candy)
+```
+2. Clean up data by making column names more readable and filtering to rows that include only chocolate candy (the one I am most interested in).
+
+
+```{r clean_data}
+library(dplyr)
+
+candy <- candy %>% 
+  rename(candy = competitorname,
+         peanuty_almondy = peanutyalmondy, 
+         crisped_rice_wafer = crispedricewafer, 
+         sugar_percent = sugarpercent,
+         price_percent = pricepercent,
+         win_percent = winpercent) %>% 
+  filter(chocolate == "1")
+```
+
+
+## Section 3: Characteristics of the data
+
+
+1. There are `r nrow(candy)` rows and `r ncol(candy)` columns in the filtered candy data set that includes only chocolate candy.
+
+```{r kable_table}
+library(knitr)
+
+my.df <- data.frame(Column_Name = c("candy", "chocolate", "fruity",  "caramel",
+                               "peanut_almondy", "nougat", "crisped_rice_wafer",
+                               "hard", "bar", "pluribus", "sugar_percent",
+                               "price_percent", "win_percent"),
+                    Description = c("Name of candy", 
+                                    "Does it contain chocolate?",
+                                    "Is it fruit flavored?",
+                                    "Is there caramel in the candy?",
+                                    "Does it contain peanuts or almonds",
+                                    "Does it contain nougat?",
+                                    "Does it contain crisped rice or wafers?",
+                                    "Is it a hard candy?",
+                                    "Is it a candy bar?",
+                                    "Is it one of many candies in unit?",
+                                    "The percentile of sugar.",
+                                    "The unit price percentile.",
+                                    "The overall win percentage."),
+                    Unit = c("N/a", "True (1) or False (0)",
+                             "True (1) or False (0)",
+                             "True (1) or False (0)",
+                             "True (1) or False (0)",
+                             "True (1) or False (0)",
+                             "True (1) or False (0)",
+                             "True (1) or False (0)",
+                             "True (1) or False (0)",
+                             "True (1) or False (0)",
+                             "Percent", "Percent", "Percent"))
+
+
+kable(my.df, digits = 2, align = c("r", "c"),
+      caption = "Candy set data")
+```
+
+
+## Section 4: Summary statistics
+
+
+1. Summary of sugar percent (the percentile of sugar it falls 
+under within the data set).
+
+
+```{r sugar_percent}
+sugar <- candy %>%
+  summarize(count_na = sum(is.na(sugar_percent)),
+            min_sugar = min(sugar_percent),
+            max_sugar = max(sugar_percent), 
+            mean_sugar = mean(sugar_percent))
+
+sugar
+```
+
+
+2. Summary of price percent (the unit price percentile 
+compared to the rest of the set).
+
+
+```{r price_percent}
+price <- candy %>%
+  summarize(count_na = sum(is.na(price_percent)),
+            min_price = min(price_percent),
+            max_price = max(price_percent), 
+            mean_price = mean(price_percent))
+
+price
+```
+
+3. Summary of win percent (the overall win percentage according 
+to 269,000 matchups).
+
+
+```{r wins}
+wins <- candy %>%
+  summarize(count_na = sum(is.na(win_percent)),
+            min_wins = min(win_percent),
+            max_wins = max(win_percent), 
+            mean_wins = mean(win_percent))
+
+wins
+```
+
+
+## Section 5: Visualizing the data
+
+
+1. The histogram gives me an idea of how much relative sugar content chocolate
+candy has. This plot shows that there is a cluster of chocolate candy around the 25th percentile and the 60th percentile, which is lower than I would have 
+thought. This plot uses clear labels and I decreased the data density at least
+a little bit by using a minimalist theme.
+
+```{r, fig.width=4, fig.height=2, histogram}
+library(ggplot2)
+library(ggthemes)
+
+ggplot(candy, aes(x = sugar_percent)) + 
+  geom_histogram(bins=20, fill = "chocolate", color = "black") + 
+  ggtitle("      Relative Sugar Content 
+          in Chocolate Candy") + 
+  xlab("Sugar Percentile") +
+  theme_few()
+```
+
+
+2. This scatter plot shows the relationship between the relative cost of the 
+candy and how often the candy won in the head-to-head battles. This reveals
+any relationships- for example, if more expensive candy is more likely to win.
+This actually showed that the candy with the best chances at winning was around
+the 65th percentile in price point. This plot uses clear labels, a minimalist
+theme, shows a reference with a fitted curve, and highlighted the 
+65th percentile.
+
+
+```{r, fig.height=2.5}
+ggplot(candy, aes(x=price_percent, y=win_percent))+
+  geom_vline(xintercept=0.652)+
+  geom_point(size=2)+
+  theme_few()+
+  geom_smooth()+
+  ggtitle("Price vs Chances of Chocolate Candy Winning") + 
+  xlab("Relative Price (%)") +
+  ylab("Relative Amount of Wins (%)")
+```
+

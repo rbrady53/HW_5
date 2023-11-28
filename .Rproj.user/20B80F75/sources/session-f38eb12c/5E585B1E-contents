@@ -1,0 +1,220 @@
+---
+title: 'Homework #3'
+author: "Rachel Brady"
+date: "2023-10-18"
+output: pdf_document
+---
+
+## Question 1- Include all code and results, but no warnings, errors or messages. 
+
+```{r setup}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+## Question 2- Improve a figure from homework #2
+
+# Load original dataset, clean it, and load original figure
+```{r load data and original figure from HW2}
+library(readr)
+
+get_candy <- paste0("https://raw.githubusercontent.com/fivethirtyeight",
+                      "/data/master/candy-power-ranking/candy-data.csv")
+candy <- read_csv(get_candy)
+
+library(dplyr)
+
+candy <- candy %>% 
+  rename(candy = competitorname,
+         peanuty_almondy = peanutyalmondy, 
+         crisped_rice_wafer = crispedricewafer, 
+         sugar_percent = sugarpercent,
+         price_percent = pricepercent,
+         win_percent = winpercent) %>% 
+  filter(chocolate == "1")
+
+library(ggplot2)
+library(ggthemes)
+
+ggplot(candy, aes(x=price_percent, y=win_percent))+
+  geom_vline(xintercept=0.652)+
+  geom_point(size=2)+
+  theme_few()+
+  geom_smooth()+
+  ggtitle("Price vs Chances of Chocolate Candy Winning") + 
+  xlab("Relative Price (%)") +
+  ylab("Relative Amount of Wins (%)")
+```
+
+# Discuss the elements of good graphics
+
+1. **Aim for high data density:** I am adhering to this theme by using a 
+minimalist theme taken from Stephen Few's guidelines. These guidelines focus on 
+making a plot more readable by smart use of color.My background is a solid 
+color, which makes it easier to interpret, and contrasts well with the other 
+colors on the graph.
+2. **Use clear, meaningful labels.** Instead of using column
+names, I have changed the names of the labels and included units of measurements
+to make it more immediately clear what is being compared. My labels are not 
+overlapping or hard to read, although the y-axis label could probably be improved
+so you don't have to turn your head. 
+3. **Provide useful references.** I have provided shading in grey that indicates 
+the trend of the data, to make it more clear at a glance the relationship
+between the two variables.
+4. **Highlight interesting aspects of the data.** I added a vertical line that
+shows the price point that resulted in the most wins of candy. However I think
+I could do this better with some labels to make it more clear what I am 
+highlighting.
+5. **Make order meaningful.** I don't think this is as applicable to my plot
+since both variables are numerical, so naturally go from 0 up.
+6. **When possible, use small multiples.** Not used in my original plot.
+
+# Improve 3 elements of good graphics.
+
+```{r Improved figure}
+win <- candy %>%
+  filter(win_percent == max(win_percent)) 
+
+ggplot(candy, aes(x=price_percent, y=win_percent))+
+  geom_point(size=2)+
+  geom_point(data=candy %>%
+             filter(win_percent == 84.18029),
+             size = 4, 
+             colour = "purple") +
+  geom_text(data = win, 
+            label = "Reese's Peanut Butter cup",
+            size = 3,
+            vjust = -1.5)+
+  facet_wrap(~ peanuty_almondy, ncol = 2)+
+  theme_few()+
+  theme(axis.title.y=element_text(angle=0, vjust=0.5), plot.subtitle = element_text(hjust = 0.5))+
+  geom_smooth(level = 0.90)+
+  ggtitle("Relative Price vs Chance of Winning of Various Chocolate Candy") + 
+  labs(subtitle =              "No Peanut Butter                                Has Peanut Butter") +
+  xlab("Price (%)") +
+  ylab("Wins (%)")
+```
+
+
+# Discuss how you improved your plot
+
+2. **Use clear, meaningful labels.** I improved this by rotating the orientation
+of the y axis label. I did this by adjusting the angle and vertical 
+justification within the theme.
+4. **Highlight interesting aspects of the data.** I improved this by highlighting
+the most winningest chocolate candy by highlighting that data point, and adding
+a label explaining what candy won the most. 
+6. **When possible, use small multiples.** I improved this by adding a small
+multiple, breaking apart the chocolate candy without (0) and with (1) peanut
+butter.
+
+## Question 3- Titanic dataset
+
+# Load the dataset and create a dataframe object.
+```{r Load titanic}
+#install.packages("titanic")
+library(titanic)
+data(titanic_train)
+```
+
+
+```{r Clean up dataset}
+train <- titanic_train %>% 
+  select("Survived", "Age") %>%
+  mutate(Survived = factor(Survived, levels = c(0, 1),
+                      labels = c("Died", "Survived"))) 
+   
+```
+
+# Print out oldest five who survived and died
+```{r Oldest 5}
+train_old_survived <- train %>% 
+  group_by(Survived) %>% 
+  arrange(desc(x = Age))
+
+slice(.data = train_old_survived, 1:5)
+```
+# Create a histogram
+```{r histogram of age}
+ggplot(train, aes(x = Age)) + 
+  geom_histogram(bins = 20, fill = "blue", color = "black") +
+  ggtitle("Age of Titanic Passengers by Survival") + 
+  xlab("Age") +
+  ylab("Number of People") +
+  facet_wrap(~Survived, nrow = 2)
+```
+
+
+# Determine mean age
+```{r summary of titanic_train}
+train_2 <-  train %>% 
+  group_by(Survived) %>% 
+  summarize("Mean Age" = mean(Age, na.rm = TRUE),
+            "Total Number of People" = n(),
+            "Number of People with Missing Data" = sum(is.na(Age)))
+print(train_2)
+```
+
+# Do a statistical test
+```{r statistical test}
+var.test(Age ~Survived, data = train, alternative = "two.sided")
+t.test(Age ~ Survived, data = train, var.equal = TRUE)
+```
+This test showed that we can reject the null hypothesis, meaning our test supports that there is a significant difference in age between the two groups.
+
+## Question 4
+
+# Get word list
+```{r get word list}
+library(readr)
+library(stringr)
+words_url <- paste0("https://raw.githubusercontent.com/dwyl/", 
+                   "english-words/master/words_alpha.txt")
+
+words <- read_csv(words_url, col_names="word")
+```
+
+# Work backwards from 8 letter words starting with M
+```{r work backwards from description}
+eight_words <- words %>%
+  mutate(chars = nchar(word)) %>%
+  filter(chars == 8) %>% 
+  mutate(m_word = str_extract(word, "^m[a-z]")) %>% #This gets me 8 letter words starting with M
+  filter(!is.na(m_word)) %>% 
+  mutate(first = substr(word,1,4)) %>% 
+  mutate(second = substr (word,5,8)) %>% 
+  mutate(second_minus = substr(second, 4, nchar(second))) %>% 
+  mutate(letter = substr(second, start = 1, stop = 3)) %>% 
+  mutate(new_word = paste(second_minus, letter, sep="")) 
+
+head(eight_words)
+```  
+
+# Check if four letter words are both real words
+```{r}
+#install.packages("qdapDictionaries")
+library(qdapDictionaries)
+
+answer <- eight_words %>%
+  mutate(first_word = first %in% GradyAugmented,
+         second_word = new_word %in% GradyAugmented) %>%
+  filter(first_word == TRUE, second_word == TRUE) %>% 
+  select(word, first, new_word) 
+
+head(answer)
+
+#tried a smaller list of words, but actually don't think the answer is in here
+data(Fry_1000)
+
+answer_2 <- answer %>% 
+   mutate(first_word = first %in% Fry_1000,
+         second_word = new_word %in% Fry_1000) %>%
+  filter(first_word == TRUE, second_word == TRUE) %>% 
+  select(word, first, new_word) 
+
+head(answer_2)
+```
+
+# I think "mail slot / maillots" makes the most sense for the answer.
+
+
+

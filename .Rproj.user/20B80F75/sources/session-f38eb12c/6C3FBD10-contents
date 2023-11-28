@@ -9,7 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r}
+```{r get packages}
 #install.packages("tigris")
 library("tigris")
 tigris_use_cache = TRUE
@@ -19,5 +19,17 @@ library(purrr)
 library(broom)
 library(ggplot2)
 library(ggthemes)
+library(viridis)
+```
+## Get data
+```{r get dataset}
+get_homicide <- paste0("https://raw.githubusercontent.com/washingtonpost/",
+                       "data-homicides/master/homicide-data.csv")
+
+homicide <- read_csv(get_homicide) %>% 
+  mutate(city_name = (paste(city, state, sep=", ")))
+
+albur <- homicide %>% 
+  filter(city_name == "Albuquerque, NM" )
 ```
 
