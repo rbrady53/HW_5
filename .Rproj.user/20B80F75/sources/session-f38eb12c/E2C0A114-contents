@@ -1,0 +1,96 @@
+---
+title: 'Homework #4'
+author: "Rachel Brady"
+date: "2023-11-01"
+output:
+  word_document: default
+  html_document:
+---
+
+```{r setup}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE,
+                      error = FALSE)
+```
+
+```{r packages}
+library(readr)
+library(tidyverse)
+library(purrr)
+library(broom)
+library(ggplot2)
+library(ggthemes)
+```
+
+# Question 1
+```{r get dataset}
+get_homicide <- paste0("https://raw.githubusercontent.com/washingtonpost/",
+                       "data-homicides/master/homicide-data.csv")
+
+homicide <- read_csv(get_homicide) %>% 
+  mutate(city_name = (paste(city, state, sep=", ")))
+```
+
+
+# Question 2
+```{r nested by city}
+unsolved_df <- homicide %>%
+  mutate(open_homicide = disposition == "Closed without arrest"|
+           disposition == "Open/No arrest") %>% 
+  group_by(city_name) %>%
+  nest() %>% 
+  mutate(total_homicides = map(data, ~nrow(.x))) %>% 
+  mutate(unsolved_homicides = map(data, ~ .x %>%
+                          pull("open_homicide") %>%
+                          sum())) %>% 
+  unnest(c(total_homicides, unsolved_homicides)) %>% 
+  as.data.frame()
+```
+
+# Question 3
+```{r prop.test for Baltimore}
+prop_Balt <- unsolved_df %>% 
+  slice(3)
+
+balt_prop <- prop.test(x = prop_Balt$unsolved_homicides, 
+                       n = prop_Balt$total_homicides)
+
+print(balt_prop)
+
+baltimore <- tidy(balt_prop) %>% 
+  dplyr::select(estimate, conf.low, conf.high)
+
+print(baltimore)
+```
+
+# Question 4
+```{r prop test for all}
+all_prop <- unsolved_df %>%
+  mutate(prop = map2(unsolved_homicides, total_homicides, 
+                     ~ prop.test(.x, .y, conf.level=0.95) %>%
+                                     broom::tidy())) %>%
+  unnest(prop, drop = TRUE)
+
+head(all_prop)
+```
+# Question 5
+```{r fig.width=5, fig.height=8}
+all_prop %>% 
+  slice(-50) %>% 
+  mutate(city_name = fct_reorder(city_name, estimate)) %>% 
+  ggplot(aes(x = city_name, y = estimate)) + 
+  geom_point(color = "white", shape=16) + 
+  geom_pointrange(aes(ymin = conf.low, ymax = conf.high), color = "white") + 
+  coord_flip() + 
+  scale_y_continuous(labels = scales::percent_format(scale = 100)) +
+  labs(title = "Unsolved homicides by city",
+       x = "",
+       y = "Percent of homicides that are unsolved", 
+       subtitle = "Bars show 95% confidence interval") + 
+  theme_dark() 
+```
+
+
+
+
+
+
