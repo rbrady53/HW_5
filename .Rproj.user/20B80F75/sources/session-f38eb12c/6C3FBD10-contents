@@ -45,11 +45,15 @@ balt2 <- balt %>%
   group_by(year, mo) %>% 
   summarize(monthly_count = n()) %>% 
   mutate(date = paste0(year, mo, sep = "01")) %>% 
-  mutate(date = ymd(date))
+  mutate(date = ymd(date)) %>% 
+  mutate(season = case_when(mo %in% c("05", "06", "07", "08", "09", "10") ~ "Summer",
+                            mo %in% c("11", "12", "01", "02", "03", "04") ~ "Winter"))
+
   
 balt2 %>% 
-  ggplot(aes(x = date, y = monthly_count)) +
-  geom_col(stat = "identity")
+  ggplot() +
+  geom_col(aes(x = date, y = monthly_count, fill = season)) +
+  theme_dark()
   #labs(x = "Month", y = "# of events") + 
   #gghighlight(max(n) > 400, label_key = event_type) +
   #facet_wrap(~ event_type, ncol = 1)
