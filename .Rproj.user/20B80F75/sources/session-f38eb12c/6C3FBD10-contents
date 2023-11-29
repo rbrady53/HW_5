@@ -18,6 +18,8 @@ library(ggplot2)
 library(ggthemes)
 library(viridis)
 library(forcats)
+library(lubridate)
+library(stringr)
 ```
 
 # Get data, filter to one city
@@ -28,7 +30,13 @@ get_homicide <- paste0("https://raw.githubusercontent.com/washingtonpost/",
 homicide <- read_csv(get_homicide) %>% 
   mutate(city_name = (paste(city, state, sep=", ")))
 
-albur <- homicide %>% 
-  filter(city_name == "Albuquerque, NM" )
+balt <- homicide %>% 
+  filter(city_name == "Baltimore, MD" )
 ```
+
+```{r date}
+balt <- balt %>% 
+  mutate(reported_date = ymd(reported_date))
+```
+
 

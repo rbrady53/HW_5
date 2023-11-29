@@ -9,22 +9,34 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+```{r get packages}
+library(readr)
+library(tidyverse)
+library(purrr)
+library(broom)
+library(ggplot2)
+library(ggthemes)
+library(viridis)
+library(forcats)
+library(lubridate)
+library(stringr)
 ```
 
-## Including Plots
+# Get data, filter to one city
+```{r get dataset}
+get_homicide <- paste0("https://raw.githubusercontent.com/washingtonpost/",
+                       "data-homicides/master/homicide-data.csv")
 
-You can also embed plots, for example:
+homicide <- read_csv(get_homicide) %>% 
+  mutate(city_name = (paste(city, state, sep=", ")))
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+balt <- homicide %>% 
+  filter(city_name == "Baltimore, MD" )
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r date}
+balt <- balt %>% 
+  mutate(reported_date = ymd(reported_date))
+```
+
+
