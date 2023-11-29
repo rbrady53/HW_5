@@ -1,0 +1,5 @@
+"0","balt <- balt %>% "
+"0","  mutate(reported_date = ymd(reported_date)) %>% "
+"0","  mutate(substr(reported_date, 1,4))"
+"0",""
+"0",""
