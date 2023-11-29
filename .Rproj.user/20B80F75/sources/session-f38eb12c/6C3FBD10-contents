@@ -32,4 +32,11 @@ homicide <- read_csv(get_homicide) %>%
 albur <- homicide %>% 
   filter(city_name == "Albuquerque, NM" )
 ```
+```{r making block maps}
+nm_blocks <- voting_districts(35,001, class="sf")
+
+ggplot() + 
+  geom_sf(data = nm_blocks)
+```
+
 
