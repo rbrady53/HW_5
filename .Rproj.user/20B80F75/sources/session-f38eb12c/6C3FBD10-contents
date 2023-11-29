@@ -10,9 +10,6 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r get packages}
-#install.packages("tigris")
-library("tigris")
-tigris_use_cache = TRUE
 library(readr)
 library(tidyverse)
 library(purrr)
@@ -20,8 +17,10 @@ library(broom)
 library(ggplot2)
 library(ggthemes)
 library(viridis)
+library(forcats)
 ```
-## Get data
+
+# Get data, filter to one city
 ```{r get dataset}
 get_homicide <- paste0("https://raw.githubusercontent.com/washingtonpost/",
                        "data-homicides/master/homicide-data.csv")
@@ -32,11 +31,4 @@ homicide <- read_csv(get_homicide) %>%
 albur <- homicide %>% 
   filter(city_name == "Albuquerque, NM" )
 ```
-```{r making block maps}
-nm_blocks <- voting_districts(35,001, class="sf")
-
-ggplot() + 
-  geom_sf(data = nm_blocks)
-```
-
 
