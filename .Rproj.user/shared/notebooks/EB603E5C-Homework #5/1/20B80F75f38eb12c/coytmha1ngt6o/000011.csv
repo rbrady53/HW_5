@@ -1,0 +1,6 @@
+"0","murd_by_month <- balt %>% "
+"0","  #filter(event_type %in% c(""Flood"", ""Flash Flood"", ""Heavy Rain"")) %>% "
+"0","  #mutate(month = month(begin_date_time, label = TRUE)) %>% "
+"0","  group_by(mo) %>% "
+"0","  count() %>% "
+"0","  ungroup()"

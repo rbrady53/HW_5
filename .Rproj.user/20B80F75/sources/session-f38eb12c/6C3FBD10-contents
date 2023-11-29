@@ -42,4 +42,13 @@ balt <- balt %>%
   mutate(mo = substr(reported_date, 6,7))
 ```
 
+```{r}
+murd_by_month <- balt %>% 
+  #filter(event_type %in% c("Flood", "Flash Flood", "Heavy Rain")) %>% 
+  #mutate(month = month(begin_date_time, label = TRUE)) %>% 
+  group_by(mo) %>% 
+  count() %>% 
+  ungroup()
+```
+
 
