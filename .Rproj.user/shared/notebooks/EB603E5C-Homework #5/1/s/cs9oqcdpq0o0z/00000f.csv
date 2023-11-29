@@ -1,6 +1,8 @@
-"0","homicide <- read_csv(get_homicide) %>% 
-  mutate(city_name = (paste(city, state, sep="", "")))
-"
+"0","get_homicide <- paste0(""https://raw.githubusercontent.com/washingtonpost/"","
+"0","                       ""data-homicides/master/homicide-data.csv"")"
+"0",""
+"0","homicide <- read_csv(get_homicide) %>% "
+"0","  mutate(city_name = (paste(city, state, sep="", "")))"
 "2","[1mRows: [22m[34m52179[39m [1mColumns: [22m[34m12[39m"
 "2","[36m──[39m [1mColumn specification[22m [36m─────────────────────────────────────────────────────────────[39m
 [1mDelimiter:[22m "",""
@@ -9,3 +11,5 @@
 "2","
 [36mℹ[39m Use `spec()` to retrieve the full column specification for this data.
 [36mℹ[39m Specify the column types or set `show_col_types = FALSE` to quiet this message."
+"0","balt <- homicide %>% "
+"0","  filter(city_name == ""Baltimore, MD"" )"

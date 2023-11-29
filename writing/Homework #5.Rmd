@@ -35,11 +35,24 @@ balt <- homicide %>%
 ```
 
 # Change date and pull out year and month
-```{r date}
-balt <- balt %>% 
+
+```{r}
+balt2 <- balt %>% 
   mutate(reported_date = ymd(reported_date)) %>% 
   mutate(year = substr(reported_date, 1,4)) %>% 
-  mutate(mo = substr(reported_date, 6,7))
+  mutate(mo = substr(reported_date, 6,7)) %>% 
+  select(reported_date, year, mo) %>% 
+  group_by(year, mo) %>% 
+  summarize(monthly_count = n()) %>% 
+  mutate(date = paste0(year, mo, sep = "01")) %>% 
+  mutate(date = ymd(date))
+  
+balt2 %>% 
+  ggplot(aes(x = date, y = monthly_count)) +
+  geom_col(stat = "identity")
+  #labs(x = "Month", y = "# of events") + 
+  #gghighlight(max(n) > 400, label_key = event_type) +
+  #facet_wrap(~ event_type, ncol = 1)
 ```
 
 
