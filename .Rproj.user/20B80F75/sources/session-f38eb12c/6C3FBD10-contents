@@ -54,10 +54,17 @@ color <- c("#CCCCCC","#99CCFF", "white")
 balt2 %>% 
   ggplot() +
   geom_col(aes(x = date, y = monthly_count, fill = season)) +
+  geom_smooth(aes(x = date, y = monthly_count), color = "#6666FF", se = FALSE,
+              span = 0.1, size = 1.5) + 
   theme_dark() +
-  scale_fill_manual(values= color)
+  scale_fill_manual(values= color) +
+  labs(title = "Homicides in Baltimore, MD",
+       x = "Date",
+       y = "Monthly homicides") +
+  theme(legend.position = "bottom") +
+  theme(legend.title=element_blank()) 
 
-  #labs(x = "Month", y = "# of events") + 
+#labs(x = "Month", y = "# of events") + 
   #gghighlight(max(n) > 400, label_key = event_type) +
   #facet_wrap(~ event_type, ncol = 1)
 ```
