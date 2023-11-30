@@ -86,7 +86,7 @@ all_prop %>%
        x = "",
        y = "Percent of homicides that are unsolved", 
        subtitle = "Bars show 95% confidence interval") + 
-  theme_dark() 
+  theme_dark()
 ```
 
 
