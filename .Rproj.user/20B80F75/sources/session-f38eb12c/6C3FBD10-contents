@@ -51,7 +51,7 @@ balt2 <- balt %>%
 ```
 
 # Plotting
-```{r fig.width = 5, fig.height = 3, make the plot}
+```{r fig.width = 10, fig.height = 3}
 color <- c("#CCCCCC","#99CCFF", "white") #making color scheme
 
 vline.data <- data.frame(z=c("2015-04-01"))
@@ -71,10 +71,10 @@ balt2 %>%
   theme(legend.position = "bottom") +
   theme(legend.title=element_blank()) +
   geom_vline(aes(xintercept = z), color = "#CC0000", size=2,
-             linetype = "longdash", vline.data) +
-  annotate("text", x = ymd("2014-03-01"), y = 43, 
+             linetype = "dashed", vline.data) +
+  annotate("text", x = ymd("2014-08-01"), y = 40, 
            label = "          Arrest of \n Freddie Grey", 
-           color = "#CCCCCC")
+           color = "white")
 ```
 
 
