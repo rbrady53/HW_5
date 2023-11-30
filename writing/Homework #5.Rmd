@@ -51,7 +51,7 @@ balt2 <- balt %>%
 ```
 
 # Plotting
-```{r make the plot}
+```{r fig.width = 5, fig.height = 3, make the plot}
 color <- c("#CCCCCC","#99CCFF", "white") #making color scheme
 
 vline.data <- data.frame(z=c("2015-04-01"))
@@ -62,7 +62,7 @@ balt2 %>%
   ggplot() +
   geom_col(aes(x = date, y = monthly_count, fill = season)) +
   geom_smooth(aes(x = date, y = monthly_count), color = "#6666FF", se = FALSE,
-              span = 0.1, size = 1.5) + 
+              span = 0.1, linewidth = 1.5) + 
   theme_dark() +
   scale_fill_manual(values= color) +
   labs(title = "Homicides in Baltimore, MD",
@@ -72,9 +72,9 @@ balt2 %>%
   theme(legend.title=element_blank()) +
   geom_vline(aes(xintercept = z), color = "#CC0000", size=2,
              linetype = "longdash", vline.data) +
-  annotate("text", x = ymd("2014-05-01"), y = 43, 
+  annotate("text", x = ymd("2014-03-01"), y = 43, 
            label = "          Arrest of \n Freddie Grey", 
-           color = "white")
+           color = "#CCCCCC")
 ```
 
 
