@@ -2,13 +2,16 @@
 title: 'Homework #5'
 author: "Rachel Brady"
 date: "2023-11-28"
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+# Packages
 ```{r get packages}
 library(readr)
 library(tidyverse)
@@ -16,8 +19,6 @@ library(purrr)
 library(broom)
 library(ggplot2)
 library(ggthemes)
-library(viridis)
-library(forcats)
 library(lubridate)
 library(stringr)
 ```
@@ -70,10 +71,10 @@ balt2 %>%
        y = "Monthly homicides") +
   theme(legend.position = "bottom") +
   theme(legend.title=element_blank()) +
-  geom_vline(aes(xintercept = z), color = "#CC0000", size=2,
+  geom_vline(aes(xintercept = z), color = "#CC0000", linewidth = 2,
              linetype = "dashed", vline.data) +
   annotate("text", x = ymd("2014-08-01"), y = 40, 
-           label = "          Arrest of \n Freddie Grey", 
+           label = "        Arrest of \n Freddie Grey", 
            color = "white")
 ```
 
