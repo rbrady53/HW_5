@@ -1,0 +1,77 @@
+---
+title: "Homework 5"
+author: "Danielle Scott"
+date: "2023-11-28"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+list.files("data/")
+```
+
+```{r}
+library(tidyverse)
+library(lubridate)
+library(geomtextpath)
+```
+
+```{r}
+homicide <- read_csv("data/homicide-data (1).csv")
+```
+
+```{r}
+baltimore <- homicide %>%
+  filter(city == "Baltimore")
+
+unique(baltimore$city) #confirm only Baltimore included in new dataframe
+```
+
+```{r}
+baltimore <- baltimore %>%
+  rename(date = reported_date) %>%
+  mutate(date = ymd(date))
+
+class(baltimore$date)
+```
+
+```{r}
+baltimore_v2 <- baltimore %>%
+  mutate(month = month(date),
+         year = year(date)) %>%
+  group_by(year, month) %>%
+  summarise(monthly_homicide = n()) %>%
+  unite(date, month, year, sep = "-") %>%
+  mutate(date = my(date)) %>%
+  mutate(year = year(date),
+         month = month(date)) %>%
+  mutate(season = as.factor(case_when(
+    month %in% 5:10 ~ "Summer",
+    month %in% c(11, 12, 1, 2, 3, 4) ~ "winter"
+  )))
+
+baltimore_v2
+```
+
+```{r fig.height = 4, fig.width = 10}
+baltimore_v2 %>%
+  ggplot() +
+  geom_col(aes(x = date, y = monthly_homicide, fill = season)) +
+  scale_fill_manual(values=c("lightgray",
+                           "lightblue")) +
+  theme_dark() + 
+  xlab("Date") + 
+  ylab("Monthly homicides") +
+  ggtitle("Homicides in Baltimore, MD") +
+  geom_smooth(aes(x = date, y = monthly_homicide), 
+              color = "blue", se = F, span = 0.1) +
+  geom_vline(xintercept = ymd("2015-04-15"), color = "red", linetype = 5,
+             lwd = 1) +
+  annotate(geom = "text", x = ymd("2014-12-01"), y = 42, 
+           label = "Arrest of\nFreddie Gray", color = "lightgray", 
+           hjust = 1, size = 4)
+```
+
